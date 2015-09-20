@@ -2,19 +2,27 @@
 // var stringifyJSON = JSON.stringify;
 
 // but you don't so you're going to write it from scratch:
-
-var obj1 = {red:true, height:5, color:"red"};
-
-var stringifyJSON = function(obj){
-
-    if(typeof(obj) === 'object' && obj && !Array.isArray(obj)){
+var stringifyJSON = function (obj) {
+  if (Array.isArray(obj)) {
+    var results = [];
+    for (var i = 0; i < obj.length; i++) {
+      if (obj[i] === undefined || typeof obj[i] === 'function') {
+        continue;
+      }
+      results.push(stringifyJSON(obj[i]));
+    }
+    return '[' + results.join(',') + ']';
+  }
+  if (typeof(obj) === 'object' && obj) {
       var strArr = [];
       var keyArray = Object.keys(obj);
-        for(var i=0;i<keyArray.length;i++){
+        for(var i = 0; i < keyArray.length; i++) {
             var currentKey = keyArray[i];
             var currentVal = obj[keyArray[i]];
             var keyVal;
-            if(typeof(currentVal) === 'string'){
+            if (currentVal === undefined || typeof currentVal === 'function') {
+              continue;
+            } else if(typeof(currentVal) === 'string') {
               keyVal = '"'+currentKey+'":'+'"'+currentVal+'"';
             } else if(!currentVal){
                   keyVal = '"'+currentKey+'":'+currentVal;
@@ -25,23 +33,12 @@ var stringifyJSON = function(obj){
             }
             strArr.push(keyVal);
         }
-    return "{" + strArr.join(",") + "}";
+        return "{" + strArr.join(",") + "}";
   } else {
-    return Array.isArray(obj) ? obj :
-           obj === null ? 'null' :
+    return obj === null ? 'null' :
            obj === false ? 'false':
            typeof(obj) === 'string' ? '"'+obj+'"' :
            !obj ? obj : obj.toString();
   }
 };
-var arr = [];
-console.log(stringifyJSON(obj1));
-console.log(JSON.stringify(obj1));
-console.log(stringifyJSON(arr));
-console.log(JSON.stringify(arr));
 
-/*
-  _.each(keyArray, function(x){
-    return x = x.toString();
-  });
-*/
